@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList - 個人資料</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="icon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', '微軟正黑體', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 240px;
+            background-color: #0078d7;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header img {
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+        }
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .sidebar-menu {
+            padding: 20px;
+        }
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .profile-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .profile-header {
+            background-color: #0078d7;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #0078d7;
+        }
+        .profile-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 5px;
+        }
+        .profile-email {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0078d7;
+            margin: 0 0 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .profile-content {
+            padding: 30px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 20px;
+            color: #333;
+        }
+        .profile-info {
+            margin-bottom: 30px;
+        }
+        .info-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .info-label {
+            width: 120px;
+            font-weight: 600;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0067b8;
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: #0078d7;
+            border: 1px solid #0078d7;
+        }
+        .btn-outline:hover {
+            background-color: rgba(0, 120, 215, 0.1);
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="icon.png" alt="TodoList 圖標">
+                <h2>TodoList</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="#"><i class="fas fa-tasks"></i> 所有任務</a></li>
+                    <li><a href="#"><i class="fas fa-check"></i> 已完成</a></li>
+                    <li><a href="#"><i class="fas fa-times"></i> 未完成</a></li>
+                    <li><a href="#" class="active"><i class="fas fa-user"></i> 個人資料</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i> 登出</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">我的個人資料</h1>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="profile-name">張小明</h2>
+                    <div class="profile-email">xiaoming.zhang@example.com</div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">總任務數</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">已完成</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">7</div>
+                        <div class="stat-label">待處理</div>
+                    </div>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <h3 class="section-title">帳戶資訊</h3>
+                        
+                        <div class="info-item">
+                            <div class="info-label">姓名</div>
+                            <div class="info-value">張小明</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">電子郵件</div>
+                            <div class="info-value">xiaoming.zhang@example.com</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">帳戶類型</div>
+                            <div class="info-value">Google 帳戶</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">加入日期</div>
+                            <div class="info-value">2024年3月15日</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">編輯個人資料</button>
+                        <button class="btn btn-outline">變更密碼</button>
+                        <button class="btn btn-danger">刪除帳戶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

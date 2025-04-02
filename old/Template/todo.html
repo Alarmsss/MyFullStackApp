@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList - 任務列表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="icon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', '微軟正黑體', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 240px;
+            background-color: #0078d7;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header img {
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+        }
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .sidebar-menu {
+            padding: 20px;
+        }
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #666;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 30px;
+            padding: 5px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .search-bar input {
+            border: none;
+            padding: 8px;
+            outline: none;
+            width: 300px;
+        }
+        .search-bar i {
+            color: #999;
+        }
+        .filters {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .filter-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #0078d7;
+            color: white;
+            border-color: #0078d7;
+        }
+        .add-todo {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .add-todo-form {
+            display: flex;
+            align-items: center;
+        }
+        .add-todo-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .add-todo-input:focus {
+            border-color: #0078d7;
+        }
+        .add-todo-btn {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .add-todo-btn:hover {
+            background-color: #0067b8;
+        }
+        .todo-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .todo-title {
+            flex: 1;
+            font-size: 16px;
+        }
+        .todo-title.completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .todo-action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .todo-action-btn:hover {
+            color: #333;
+        }
+        .todo-action-btn.delete:hover {
+            color: #e74c3c;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        .page-btn {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .page-btn:hover, .page-btn.active {
+            background-color: #0078d7;
+            color: white;
+            border-color: #0078d7;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="icon.png" alt="TodoList 圖標">
+                <h2>TodoList</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-tasks"></i> 所有任務</a></li>
+                    <li><a href="#"><i class="fas fa-check"></i> 已完成</a></li>
+                    <li><a href="#"><i class="fas fa-times"></i> 未完成</a></li>
+                    <li><a href="#"><i class="fas fa-user"></i> 個人資料</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i> 登出</a></li>
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜尋待辦事項...">
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span>張小明</span>
+                </div>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active">全部</button>
+                <button class="filter-btn">已完成</button>
+                <button class="filter-btn">未完成</button>
+            </div>
+            
+            <div class="add-todo">
+                <form class="add-todo-form">
+                    <input type="text" class="add-todo-input" placeholder="新增待辦事項...">
+                    <button type="submit" class="add-todo-btn">新增</button>
+                </form>
+            </div>
+            
+            <div class="todo-list">
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-title">完成專案文檔</div>
+                    <div class="todo-actions">
+                        <button class="todo-action-btn edit"><i class="fas fa-edit"></i></button>
+                        <button class="todo-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox" checked>
+                    <div class="todo-title completed">設計使用者介面</div>
+                    <div class="todo-actions">
+                        <button class="todo-action-btn edit"><i class="fas fa-edit"></i></button>
+                        <button class="todo-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-title">修復 API 整合問題</div>
+                    <div class="todo-actions">
+                        <button class="todo-action-btn edit"><i class="fas fa-edit"></i></button>
+                        <button class="todo-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox">
+                    <div class="todo-title">實現使用者驗證功能</div>
+                    <div class="todo-actions">
+                        <button class="todo-action-btn edit"><i class="fas fa-edit"></i></button>
+                        <button class="todo-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                
+                <div class="todo-item">
+                    <input type="checkbox" class="todo-checkbox" checked>
+                    <div class="todo-title completed">建立線框圖</div>
+                    <div class="todo-actions">
+                        <button class="todo-action-btn edit"><i class="fas fa-edit"></i></button>
+                        <button class="todo-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

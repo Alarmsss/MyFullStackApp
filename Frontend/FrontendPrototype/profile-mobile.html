@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList - 個人資料</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="icon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', '微軟正黑體', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        .header {
+            background-color: #0078d7;
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .back-btn i {
+            margin-right: 5px;
+        }
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .main-content {
+            flex: 1;
+            padding: 15px;
+        }
+        .profile-header {
+            background-color: #0078d7;
+            color: white;
+            padding: 30px 20px;
+            margin: -15px -15px 20px;
+            text-align: center;
+            position: relative;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #0078d7;
+        }
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 5px;
+        }
+        .profile-email {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0078d7;
+            margin: 0 0 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .profile-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 15px;
+            color: #333;
+        }
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .info-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #0078d7;
+            color: white;
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: #0078d7;
+            border: 1px solid #0078d7;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            margin-top: 10px;
+        }
+        .bottom-nav {
+            display: flex;
+            background-color: white;
+            border-top: 1px solid #eee;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            text-decoration: none;
+            color: #999;
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: #0078d7;
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <button class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="page-title">我的個人資料</div>
+            <button class="action-btn">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        
+        <div class="main-content">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 class="profile-name">張小明</h2>
+                <div class="profile-email">xiaoming.zhang@example.com</div>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">總任務數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">待處理</div>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h3 class="section-title">帳戶資訊</h3>
+                <div class="info-list">
+                    <div class="info-item">
+                        <div class="info-label">姓名</div>
+                        <div class="info-value">張小明</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">電子郵件</div>
+                        <div class="info-value">xiaoming.zhang@example.com</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">帳戶類型</div>
+                        <div class="info-value">Google 帳戶</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">加入日期</div>
+                        <div class="info-value">2024年3月15日</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h3 class="section-title">帳戶設定</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">編輯個人資料</button>
+                    <button class="btn btn-outline">變更密碼</button>
+                    <button class="btn btn-danger">刪除帳戶</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <i class="fas fa-tasks"></i>
+                <span>任務</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-check"></i>
+                <span>已完成</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-user"></i>
+                <span>個人資料</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

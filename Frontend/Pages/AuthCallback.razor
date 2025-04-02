@@ -1,0 +1,70 @@
+@page "/auth/callback"
+@using Frontend.Services
+@inject NavigationManager Navigation
+
+<div class="auth-callback-container">
+    <h2>授權成功</h2>
+    
+    @if (!string.IsNullOrEmpty(_authCode))
+    {
+        <div class="code-info">
+            <h3>授權碼</h3>
+            <pre>@_authCode</pre>
+            <p class="info-text">此授權碼可用於後續的身份驗證流程</p>
+        </div>
+    }
+    else
+    {
+        <div class="error-message">
+            <p>未收到授權碼</p>
+        </div>
+    }
+</div>
+
+@code {
+    private string? _authCode;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        _authCode = queryParams["code"];
+    }
+}
+
+<style>
+    .auth-callback-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .code-info {
+        margin-top: 2rem;
+    }
+
+    pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: #f5f5f5;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+
+    .info-text {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+
+    .error-message {
+        color: #dc3545;
+        text-align: center;
+        margin-top: 2rem;
+    }
+</style> 

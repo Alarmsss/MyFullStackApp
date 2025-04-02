@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Frontend</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="icon.png" type="image/png">
+    <link href="Frontend.styles.css" rel="stylesheet" />
+    <style>
+        :root {
+            --app-blue: #2196F3;
+            --light-blue: #64B5F6;
+            --white: #ffffff;
+            --bg-blue: #1976D2;
+            --check-blue: #42A5F5;
+        }
+
+        /* 全域字體設定 */
+        body {
+            margin: 0;
+            font-family: 
+                'Noto Sans TC',
+                'PingFang TC',
+                'Microsoft JhengHei',
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                Roboto,
+                'Helvetica Neue',
+                Arial,
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 隱藏 Blazor 預設的 loading 動畫 */
+        .loading-progress {
+            display: none !important;
+        }
+        
+        .loading-progress-text {
+            display: none !important;
+        }
+
+        /* 初始狀態：隱藏 Blazor 應用 */
+        #app {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            position: relative;
+            min-height: 100vh;
+            display: block;
+        }
+
+        #app.fade-in {
+            opacity: 1;
+        }
+
+        /* 載入動畫容器 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; /* 支援動態視口高度 */
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            pointer-events: none;
+        }
+
+        .loading-container {
+            position: relative;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: content-box;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 3rem;
+            animation: icon-float 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(33, 150, 243, 0.3));
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .todo-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(33, 150, 243, 0.15);
+            box-sizing: content-box;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            width: 100%;
+            box-sizing: border-box;
+            will-change: transform, opacity;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            visibility: hidden;
+        }
+
+        .todo-item.animate {
+            visibility: visible;
+            animation: slide-in 0.15s ease-out forwards;
+        }
+
+        .todo-item.animate .checkbox,
+        .todo-item.animate .line {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .todo-item:not(.animate) .checkbox,
+        .todo-item:not(.animate) .line {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .todo-item:nth-child(1).animate { animation-delay: 0s; }
+        .todo-item:nth-child(2).animate { animation-delay: 0.05s; }
+        .todo-item:nth-child(3).animate { animation-delay: 0.1s; }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--app-blue);
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox.checked {
+            background: var(--check-blue);
+            border-color: var(--check-blue);
+        }
+
+        .checkbox.checked::after {
+            content: '';
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: translate(-50%, -50%) rotate(45deg);
+            animation: check-mark 0.3s ease-out forwards;
+        }
+
+        .line {
+            height: 10px;
+            background: var(--light-blue);
+            border-radius: 5px;
+            flex-grow: 1;
+            opacity: 0.2;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loading-text {
+            color: var(--app-blue);
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-top: 2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes check-mark {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(45deg) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(45deg) scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite steps(4, end);
+        }
+
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        /* 手機版樣式 */
+        @media (max-width: 768px) {
+            .loading-screen {
+                padding: 1rem;
+            }
+
+            .loading-container {
+                width: 100%;
+                max-width: 280px;
+                padding: 1.5rem;
+            }
+
+            .app-icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 2rem;
+                filter: drop-shadow(0 8px 12px rgba(33, 150, 243, 0.3));
+            }
+
+            .todo-list {
+                gap: 0.75rem;
+                padding: 1rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 20px rgba(33, 150, 243, 0.15);
+            }
+
+            .todo-item {
+                gap: 0.75rem;
+            }
+
+            .checkbox {
+                width: 18px;
+                height: 18px;
+            }
+
+            .checkbox.checked::after {
+                width: 4px;
+                height: 8px;
+            }
+
+            .line {
+                height: 8px;
+                border-radius: 4px;
+            }
+
+            .loading-text {
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .loading-dots {
+                margin-left: 0.25rem;
+            }
+
+            @keyframes icon-float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+        }
+
+        /* 較小螢幕的優化 */
+        @media screen and (max-width: 768px) and (max-height: 480px) {
+            .app-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 1.5rem;
+            }
+
+            .todo-list {
+                gap: 0.5rem;
+                padding: 0.75rem;
+            }
+
+            .loading-text {
+                margin-top: 1rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 載入動畫 -->
+    <div class="loading-screen">
+        <div class="loading-container">
+            <img src="icon.png" alt="App Icon" class="app-icon">
+            <div class="todo-list">
+                <div class="todo-item">
+                    <div class="checkbox checked"></div>
+                    <div class="line"></div>
+                </div>
+                <div class="todo-item">
+                    <div class="checkbox"></div>
+                    <div class="line"></div>
+                </div>
+                <div class="todo-item">
+                    <div class="checkbox"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="loading-text">
+                載入中<span class="loading-dots"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blazor 應用容器 -->
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script>
+        // 追蹤資源載入進度
+        let checkboxes = document.querySelectorAll('.checkbox');
+        console.log('找到的 checkbox 數量:', checkboxes.length);
+
+        let currentIndex = 0; // 修改初始索引為 0，因為第一個已經打勾
+        let progressInterval;
+        let isRemoving = false;
+        let loadingStartTime = 0;
+        let isBlazorReady = false; // 追蹤 Blazor 是否已準備就緒
+        let isForward = true; // 控制動畫方向
+        let animationInterval = 500; // 統一的動畫間隔時間
+        let isAnimationStopped = false; // 新增：追蹤動畫是否已停止
+        let animationListeners = []; // 新增：儲存事件監聽器引用
+        let isInitialized = false;
+        let listenerMap = new Map();
+        let completedAnimationsSet = new Set();
+        let minimumDisplayTime = 1000;
+        let animationStartTime = 0;
+        let animationsInProgress = new Set(); // 新增：追蹤正在進行的動畫
+        let blazorLoaded = false; // 新增：追蹤 Blazor 載入狀態
+
+        // 更新 checkbox 狀態的函數
+        function nextCheckbox() {
+            if (isAnimationStopped) {
+                return;
+            }
+            
+            const currentTime = Date.now();
+            console.log(`[${currentTime}] 執行 nextCheckbox, 當前索引: ${currentIndex}, 方向: ${isForward ? '正向' : '反向'}`);
+            
+            if (isForward) {
+                currentIndex++;
+                if (currentIndex < checkboxes.length) {
+                    console.log(`[${currentTime}] 打勾第 ${currentIndex + 1} 個 checkbox`);
+                    checkboxes[currentIndex].classList.add('checked');
+                    console.log(`[${currentTime}] 已添加 checked class`);
+                } else {
+                    console.log(`[${currentTime}] 已到達最後，準備反向`);
+                    isForward = false;
+                    currentIndex = 0;
+                    nextCheckbox();
+                    return;
+                }
+            } else {
+                if (currentIndex < checkboxes.length) {
+                    console.log(`[${currentTime}] 取消打勾第 ${currentIndex + 1} 個 checkbox`);
+                    checkboxes[currentIndex].classList.remove('checked');
+                    console.log(`[${currentTime}] 已移除 checked class`);
+                    currentIndex++;
+                } else {
+                    console.log(`[${currentTime}] 已回到起點，準備正向`);
+                    isForward = true;
+                    currentIndex = -1;
+                    nextCheckbox();
+                    return;
+                }
+            }
+        }
+
+        // 移除載入畫面的函數
+        function removeLoadingScreen() {
+            if (isRemoving) {
+                console.log('正在移除中，跳過');
+                return;
+            }
+            
+            const currentTime = Date.now();
+            console.log(`[${currentTime}] 開始停止動畫`);
+            
+            // 停止動畫
+            isAnimationStopped = true;
+            
+            // 清除動畫 interval
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+                console.log(`[${currentTime}] 已清除動畫 interval`);
+            }
+            
+            // 移除所有事件監聽器
+            listenerMap.forEach((listeners, element) => {
+                element.removeEventListener('animationstart', listeners.startListener);
+                element.removeEventListener('animationend', listeners.endListener);
+            });
+            listenerMap.clear();
+            
+            // 使用 requestAnimationFrame 確保在下一幀執行移除操作
+            requestAnimationFrame(() => {
+                isRemoving = true;
+                console.log(`[${currentTime}] 開始移除載入畫面`);
+                
+                const loadingScreen = document.querySelector('.loading-screen');
+                const app = document.getElementById('app');
+                
+                if (!loadingScreen) {
+                    console.log(`[${currentTime}] 載入畫面已不存在`);
+                    isRemoving = false;
+                    return;
+                }
+                
+                app.style.display = 'block';
+                app.style.opacity = '1';
+                
+                loadingScreen.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    if (loadingScreen && loadingScreen.parentNode) {
+                        loadingScreen.remove();
+                        console.log(`[${currentTime}] 已移除載入畫面元素`);
+                    }
+                    isRemoving = false;
+                }, 300);
+            });
+        }
+
+        function initializeCheckboxes() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.addEventListener('animationend', () => {
+                    console.log(`Checkbox ${index + 1} animation ended`);
+                });
+            });
+        }
+
+        // 初始化函數
+        function initialize() {
+            if (isInitialized) {
+                console.log('已經初始化過，跳過');
+                return;
+            }
+
+            const currentTime = Date.now();
+            console.log(`[${currentTime}] 開始初始化`);
+            
+            const app = document.getElementById('app');
+            app.style.display = 'none';
+            app.style.opacity = '0';
+            console.log(`[${currentTime}] 已設置 app 元素為隱藏`);
+
+            loadingStartTime = currentTime;
+            console.log(`[${currentTime}] 記錄開始時間: ${loadingStartTime}`);
+            
+            // 重置所有 checkbox 狀態，但保持第一個為已選中
+            for (let i = 1; i < checkboxes.length; i++) {
+                checkboxes[i].classList.remove('checked');
+                console.log(`[${currentTime}] 重置第 ${i + 1} 個 checkbox`);
+            }
+            
+            currentIndex = 0; // 從 0 開始，因為第一個已經打勾
+            isForward = true;
+
+            // 清除已完成動畫的集合
+            completedAnimationsSet.clear();
+            animationsInProgress.clear();
+
+            // 移除所有舊的事件監聽器
+            listenerMap.forEach((listeners, element) => {
+                element.removeEventListener('animationstart', listeners.startListener);
+                element.removeEventListener('animationend', listeners.endListener);
+            });
+            listenerMap.clear();
+
+            // 重置動畫狀態
+            const todoItems = document.querySelectorAll('.todo-item');
+            console.log(`[${currentTime}] 找到 ${todoItems.length} 個 todo-item 元素`);
+            
+            // 設置初始狀態
+            todoItems.forEach((item, index) => {
+                console.log(`[${currentTime}] 準備第 ${index + 1} 個 todo-item`);
+                // 重置 todo-item 的狀態
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.visibility = 'hidden';
+                item.classList.remove('animate');
+            });
+
+            let completedAnimations = 0;
+            let allAnimationsCompleted = false;
+            
+            todoItems.forEach((item, index) => {
+                // 檢查是否已經添加過監聽器
+                if (listenerMap.has(item)) {
+                    console.log(`[${currentTime}] 第 ${index + 1} 個 checkbox 已經有監聽器，跳過`);
+                    return;
+                }
+
+                const startListener = () => {
+                    if (isAnimationStopped || blazorLoaded) return;
+                    const startTime = Date.now();
+                    if (index === 0) {
+                        animationStartTime = startTime;
+                    }
+                    animationsInProgress.add(item);
+                    item.classList.add('animate');
+                    console.log(`[${startTime}] 第 ${index + 1} 個 checkbox 開始滑入動畫`);
+                };
+                const endListener = () => {
+                    if (isAnimationStopped) return;
+                    
+                    // 檢查是否已經觸發過這個元素的動畫完成事件
+                    if (completedAnimationsSet.has(item)) {
+                        console.log(`[${Date.now()}] 第 ${index + 1} 個 checkbox 的動畫完成事件已觸發過，跳過`);
+                        return;
+                    }
+                    
+                    const endTime = Date.now();
+                    console.log(`[${endTime}] 第 ${index + 1} 個 checkbox 完成滑入動畫`);
+                    completedAnimationsSet.add(item);
+                    animationsInProgress.delete(item);
+                    completedAnimations++;
+                    
+                    // 當所有滑入動畫完成後，開始 checkbox 動畫
+                    if (completedAnimations === todoItems.length) {
+                        console.log(`[${endTime}] 所有滑入動畫完成，開始 checkbox 動畫`);
+                        allAnimationsCompleted = true;
+                        // 等待一小段時間確保視覺效果完整
+                        setTimeout(() => {
+                            // 設置定時器，從第二個 checkbox 開始
+                            progressInterval = setInterval(nextCheckbox, animationInterval);
+                            console.log(`[${Date.now()}] 已設置定時器，間隔 ${animationInterval}ms`);
+                        }, 100);
+                    }
+                };
+
+                item.addEventListener('animationstart', startListener);
+                item.addEventListener('animationend', endListener);
+
+                // 保存監聽器引用
+                listenerMap.set(item, { startListener, endListener });
+                console.log(`[${currentTime}] 已為第 ${index + 1} 個 checkbox 添加事件監聽器`);
+            });
+
+            // 開始動畫
+            setTimeout(() => {
+                todoItems.forEach((item, index) => {
+                    if (!blazorLoaded) {
+                        item.classList.add('animate');
+                    }
+                });
+            }, 50);
+            
+            isInitialized = true;
+        }
+
+        // 等待 Blazor 腳本載入完成後初始化
+        function waitForBlazor() {
+            console.log('檢查 Blazor 是否可用');
+            if (window.Blazor) {
+                console.log('Blazor 已可用，開始初始化');
+                // 確保 DOM 完全載入後再初始化
+                if (document.readyState === 'complete') {
+                    initialize();
+                } else {
+                    window.addEventListener('load', initialize);
+                }
+            } else {
+                console.log('Blazor 尚未可用，等待中...');
+                setTimeout(waitForBlazor, 100);
+            }
+        }
+
+        // 監聽 Blazor 資源載入狀態
+        function monitorBlazorLoading() {
+            if (window.Blazor) {
+                const currentTime = Date.now();
+                console.log(`[${currentTime}] 開始監聽 Blazor 載入狀態`);
+                
+                // 使用 Blazor 的 start() 方法
+                window.Blazor.start().then(() => {
+                    const readyTime = Date.now();
+                    console.log(`[${readyTime}] Blazor 資源載入完成`);
+                    handleBlazorLoaded();
+                }).catch(error => {
+                    console.error('Blazor 啟動失敗:', error);
+                });
+            }
+        }
+
+        // 處理 Blazor 載入完成後的邏輯
+        function handleBlazorLoaded() {
+            const currentTime = Date.now();
+            console.log(`[${currentTime}] 開始處理 Blazor 載入完成後的邏輯`);
+            
+            blazorLoaded = true;
+            isBlazorReady = true;
+            
+            // 立即停止所有未開始的動畫
+            const todoItems = document.querySelectorAll('.todo-item');
+            todoItems.forEach(item => {
+                if (!animationsInProgress.has(item)) {
+                    item.classList.remove('animate');
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    item.style.visibility = 'hidden';
+                }
+            });
+            
+            // 移除載入畫面
+            removeLoadingScreen();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM 已載入完成，開始等待 Blazor');
+            waitForBlazor();
+        });
+
+        // 監聽 Blazor 腳本載入完成事件
+        window.addEventListener('load', () => {
+            if (window.Blazor) {
+                monitorBlazorLoading();
+            }
+        });
+    </script>
+
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+</body>
+
+</html>

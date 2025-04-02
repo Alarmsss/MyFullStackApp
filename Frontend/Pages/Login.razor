@@ -1,0 +1,27 @@
+@page "/"
+@page "/login"
+@using Frontend.Services
+@inject GoogleAuthService GoogleAuth
+@inject NavigationManager Navigation
+
+<div class="login-container">
+    <div class="logo">
+        <img src="icon.png" alt="TodoList 應用圖標">
+    </div>
+    <h1>TodoList 應用</h1>
+    <div class="login-options">
+        <button class="google-login" @onclick="HandleGoogleLoginAsync">
+            <i class="fab fa-google"></i>
+            使用 Google 帳號登入
+        </button>
+    </div>
+    <p class="info-text">隨時隨地管理您的任務。<br>安全且簡單。</p>
+</div>
+
+@code {
+    private async Task HandleGoogleLoginAsync()
+    {
+        var authUrl = await GoogleAuth.GetAuthorizationUrlAsync();
+        Navigation.NavigateTo(authUrl);
+    }
+} 
