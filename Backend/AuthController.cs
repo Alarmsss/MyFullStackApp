@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MyFullStackApp.Backend.Models;
 
-[Route("api/auth")]
+[Route("auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {

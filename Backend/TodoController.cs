@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MyFullStackApp.Backend.Models;
 
 [Authorize]
-[Route("api/todos")]
+[Route("todos")]
 [ApiController]
 public class TodoController : ControllerBase
 {
